@@ -56,17 +56,10 @@ class ConanFileClass(ConanFile):
         generator = self.conf.get("tools.cmake.cmaketoolchain:generator", default="Ninja Multi-Config")
         lower_build_type = str(self.settings.build_type).lower()
 
-        env_vars = {}
-
-        # Explicitly add vcvars to the environment. Do not known why is automatically done before calling build() on conan side
-        if self.settings.os == "Windows":
-            env_vars = tools.vcvars_dict(self)
-
-        with tools.environment_append(env_vars):
-            with tools.chdir(self.source_folder):
-                cmd_cmake_config = f"cmake --preset {lower_build_type}" if generator == "Unix Makefiles" else "cmake --preset default"
-                self.run(cmd_cmake_config)
-                self.run(f"cmake --build --preset {lower_build_type}")
+        with tools.chdir(self.source_folder):
+            cmd_cmake_config = f"cmake --preset {lower_build_type}" if generator == "Unix Makefiles" else "cmake --preset default"
+            self.run(cmd_cmake_config)
+            self.run(f"cmake --build --preset {lower_build_type}")
 
     def package(self):
         self.copy("*.h", dst="include")
